@@ -1,16 +1,17 @@
 {
 	"manifest_version": 2,
-	"name": "Pronounce",
+	"name": "Wiktionary Pronounce Selection",
 	"version": "0.1",
 	
-	"description": "Query selected text pronunciation in from Wiktionary",
+	"description": "Show pronunciation of selected word from en.wiktionary.org",
 	"icons": {	"16": "images/icon16.png",
 				"32": "images/icon32.png",
 				"48": "images/icon48.png",
 				"64": "images/icon64.png" },
 	"browser_action": {
-		"default_title": "Selected Text",
-		"default_popup": "popup.html" 
+		"default_title": "Pronounce",
+		"default_popup": "popup.html",
+		"default_icon": "images/icon16.png" 
 	},
 	"content_scripts": [
 		{
