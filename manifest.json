@@ -1,0 +1,30 @@
+{
+	"manifest_version": 2,
+	"name": "Pronounce",
+	"version": "0.1",
+	
+	"description": "Query selected text pronunciation in from Wiktionary",
+	"icons": {	"16": "images/icon16.png",
+				"32": "images/icon32.png",
+				"48": "images/icon48.png",
+				"64": "images/icon64.png" },
+	"browser_action": {
+		"default_title": "Selected Text",
+		"default_popup": "popup.html" 
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["content_script.js"],
+			"run_at": "document_start",
+			"all_frames": true
+		}
+	],
+	"options_page": "options.html",
+	"permissions": [
+		"tabs",
+		"storage",
+		"http://*/*", 
+		"https://*/*"
+	]
+}

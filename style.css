@@ -1,0 +1,24 @@
+body {
+	min-width: 300px;
+	min-height: 200px
+}
+
+h1 {
+	text-align: center;
+}
+
+li li::marker {
+	content: none;
+}
+
+li::marker {
+	content: none;
+}
+
+ul ul {
+	padding-inline-start: 0px;
+}
+
+td {
+	width: 100%;
+}
