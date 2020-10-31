@@ -106,10 +106,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		"status": "complete",
 		"windowType": "normal"
 	}, function (tabs) {
-		//It returns array so looping over tabs result
 		for (tab in tabs) {
-
-			//Send Message to a tab
+			//Send Message to the tab
 			chrome.tabs.sendMessage(tabs[tab].id, {
 				method: "getSelection"
 			});
