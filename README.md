@@ -4,3 +4,4 @@ An extension for chromium based browsers to pronounce selected text using pronun
 ### Screenshots
 
 ![Screenshot](/screenshot.png)
+
