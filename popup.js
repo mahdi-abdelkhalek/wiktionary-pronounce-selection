@@ -33,13 +33,13 @@ var xhttp = new XMLHttpRequest();
 				var i = 0;
 				for (const match of matches) {
 					i++;
-					content += match[0].replace(pr + '</span>', pr + ' ' + String(i) + '</span>') + '<hr />';
+					content += match[0].replace(pr + '</span>', String(i) + '</span>') + '<hr />';
 				}
 				if (i == 0)
 					throw 'miss';
 				if (i == 1)
-					content = content.replace(pr + ' 1', pr);
-				content = content.replace(/ class=\\".*?\\"/g, '');
+					content = content.replace('1</span>', '</span>');
+				//content = content.replace(/ class=\\".*?\\"/g, '');
 				content = content.replace(/\[.*?\]/g, '');
 				content = content.replace(/<style.*?<\/style>/g, '');
 				content = content.replace(/\/\//g, 'https://');
