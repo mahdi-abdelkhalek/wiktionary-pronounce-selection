@@ -20,14 +20,8 @@ var xhttp = new XMLHttpRequest();
 				if (!match) {
 					match = content.match('<h2><span class=\\\\"mw-headline\\\\" id=\\\\"' + lang.replace(' ', '_') + '\\\\">' + lang +'<\\/span>.*');
 				}
-				if (!match) {
-					if (sectry)
+				if (!match)
 						throw 'miss';
-					else {
-						sectry = true;
-						xhrsend (selection.toLowerCase());
-					}
-				}
 				const matches = match[0].matchAll(/(<h\d>)(<span class=\\"mw-headline\\" id=\\"Pronunciation.*?)\1/g);
 				content = '<hr />';
 				var i = 0;
@@ -39,7 +33,7 @@ var xhttp = new XMLHttpRequest();
 					throw 'miss';
 				if (i == 1)
 					content = content.replace('1</span>', '</span>');
-				//content = content.replace(/ class=\\".*?\\"/g, '');
+				content = content.replace(/ class=\\".*?\\"/g, '');
 				content = content.replace(/\[.*?\]/g, '');
 				content = content.replace(/<style.*?<\/style>/g, '');
 				content = content.replace(/\/\//g, 'https://');
@@ -54,8 +48,14 @@ var xhttp = new XMLHttpRequest();
 		}
 		catch (err) {
 			if (err == 'miss') {
-				document.getElementById('title').innerHTML = pr + ': ' + selection;
-				document.getElementById('text').innerHTML = 'Wiktionary does not have a pronunciation for "<b>' + selection + '</b>" in <b>' + lang + '</b>';	
+				if (sectry) {
+					document.getElementById('title').innerHTML = pr + ': ' + selection;
+					document.getElementById('text').innerHTML = 'Wiktionary does not have a pronunciation for "<b>' + selection + '</b>" in <b>' + lang + '</b>';
+				}
+				else {
+					sectry = true;
+					xhrsend (selection.toLowerCase());
+				}	
 			}
 			else if (this.readyState == 4) {
 				if (this.status != 200) {
@@ -72,29 +72,36 @@ var xhttp = new XMLHttpRequest();
 
 //Adding a handler when a message is recieved from content scripts
 chrome.extension.onMessage.addListener(function (message, sender) {
-	selection = message.data;
-	xhrsend (selection);
+	if (message.data) {
+		sectry = false;
+		selection = message.data;
+		document.getElementById('input').value = selection;
+		xhrsend (selection);
+	}
 });
 
+function submit () {
+	sectry = false;
+	selection = document.getElementById('input').value;
+	xhrsend (selection);
+}
+
+document.getElementById("input").addEventListener("keyup", function(event) {
+	if (event.keyCode === 13)
+		document.getElementById("submit").click();
+});
 
 function xhrsend (word) {
 	try {
-		if (!word)
-			throw 'emptyword';
+		document.getElementById('text').innerHTML = '<a title="KopiteCowboy, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Loading_2.gif"><img width="128" alt="Loading 2" src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Loading_2.gif"></a>'
 		page = encodeURI(word.trim());
 		url = 'https://en.wiktionary.org/w/api.php?action=parse&prop=text&format=json&page=' + page;
 		xhttp.open('GET', url, true);
 		xhttp.send();
 	}
 	catch (err) {
-		if (err == 'emptyword') {
-			document.getElementById('title').innerHTML = 'Nothing selected ;)';
-			document.getElementById('text').innerHTML = 'You need to select a word before clicking the extension';
-		}
-		else {
 			document.getElementById('title').innerHTML = 'Oupsie';
 			document.getElementById('text').innerHTML = '<br />Unkown error :<br />' + err;
-		}
 	}
 }
 

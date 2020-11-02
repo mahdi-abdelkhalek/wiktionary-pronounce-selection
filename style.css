@@ -1,7 +1,6 @@
 body {
 	min-width: 400px;
-	min-height: 200px;
-	font-family: sans-serif;
+	min-height: 45px;
 }
 
 h1 {
@@ -22,6 +21,10 @@ ul ul {
 
 td {
 	width: 100%;
+}
+
+input {
+  width: 250px;
 }
 
 img {
