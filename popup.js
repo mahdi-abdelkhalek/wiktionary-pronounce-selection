@@ -73,7 +73,6 @@ var xhttp = new XMLHttpRequest();
 //Adding a handler when a message is recieved from content scripts
 chrome.extension.onMessage.addListener(function (message, sender) {
 	if (message.data) {
-		sectry = false;
 		selection = message.data;
 		document.getElementById('input').value = selection;
 		xhrsend (selection);
@@ -81,7 +80,6 @@ chrome.extension.onMessage.addListener(function (message, sender) {
 });
 
 function submit () {
-	sectry = false;
 	selection = document.getElementById('input').value;
 	xhrsend (selection);
 }
@@ -93,11 +91,13 @@ document.getElementById("input").addEventListener("keyup", function(event) {
 
 function xhrsend (word) {
 	try {
-		document.getElementById('text').innerHTML = '<a title="KopiteCowboy, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Loading_2.gif"><img width="128" alt="Loading 2" src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Loading_2.gif"></a>'
-		page = encodeURI(word.trim());
-		url = 'https://en.wiktionary.org/w/api.php?action=parse&prop=text&format=json&page=' + page;
-		xhttp.open('GET', url, true);
-		xhttp.send();
+		if (word) {
+			document.getElementById('text').innerHTML = '<img width="128" alt="Loading" src="images/loading.gif">'
+			page = encodeURI(word.trim());
+			url = 'https://en.wiktionary.org/w/api.php?action=parse&prop=text&format=json&page=' + page;
+			xhttp.open('GET', url, true);
+			xhttp.send();
+		}
 	}
 	catch (err) {
 			document.getElementById('title').innerHTML = 'Oupsie';
