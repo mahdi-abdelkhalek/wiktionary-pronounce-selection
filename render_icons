@@ -1,0 +1,5 @@
+convert icon.png -colorspace Gray -resize 128x128  wiktionary-pronounce-selection/images/icon128.png
+convert icon.png -colorspace Gray -resize 64x64  wiktionary-pronounce-selection/images/icon64.png
+convert icon.png -colorspace Gray -resize 48x48  wiktionary-pronounce-selection/images/icon48.png
+convert icon.png -colorspace Gray -resize 32x32  wiktionary-pronounce-selection/images/icon32.png
+convert icon.png -colorspace Gray -resize 16x16  wiktionary-pronounce-selection/images/icon16.png
