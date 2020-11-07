@@ -1,40 +1,42 @@
-var lang = 'English';
-chrome.storage.sync.get({
-		language: 'English',
-	}, function(items) {
-		lang = items.language;
-	});
-
-const pr = 'Pronunciation'; // in case support for other Wiktionary languages will be added in the futur...
+var languages = [];
+var lang;
 var selection;
 var title;
 var sectry = false;
 
+chrome.storage.sync.get({
+	languages: ['English','French','German'],
+}, function(items) {
+	languages = items.languages;
+	for(i = 0; i < languages.length; i++)
+		document.getElementById('language').innerHTML += '<option value="' + languages[i] + '">' + languages[i] + '</option>';
+	lang = languages[0];
+});
+
 var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		try {
-			if (this.readyState == 4 && this.status == 200) {
+			if(this.readyState == 4 && this.status == 200) {
 				var obj = JSON.parse(this.responseText);
-				if (obj.error)
+				if(obj.error)
 					throw 'miss';
 				var content = obj.parse.text['*'];
-				//console.log(content);
 				var match = new RegExp('<h2><span class="mw-headline" id="' + lang.replace(' ', '_') + '">' + lang +'<\/span>.*?<hr \/>', 'gms').exec(content);
-				if (!match)
+				if(!match)
 					match = new RegExp('<h2><span class="mw-headline" id="' + lang.replace(' ', '_') + '">' + lang +'<\/span>.*', 'gms').exec(content);
-				if (!match)
+				if(!match)
 					throw 'miss';
 				const matches = match[0].matchAll(/(<h\d>)(<span class="mw-headline" id="Pronunciation.*?)\1/gms);
-				content = '<hr />';
+				content = '';
 				var i = 0;
-				for (const match of matches) {
+				for(const match of matches) {
 					i++;
-					content += match[0].replace(pr + '</span>', String(i) + '</span>') + '<hr />';
+					content += match[0].replace('Pronunciation</span>', String(i) + '</span>');
 				}
-				if (i == 0)
+				if(i == 0)
 					throw 'miss';
 				sectry = false;
-				if (i == 1)
+				if(i == 1)
 					content = content.replace('1</span>', '</span>');
 				content = content.replace(/<span class="mw-editsection-bracket">\[.*?\]<\/span>/gms, '');
 				content = content.replace(/ class=".*?"/gms, '');
@@ -44,24 +46,25 @@ var xhttp = new XMLHttpRequest();
 				content = content.replace(/preload="none"/gm, 'preload="auto"');
 				content = content.replace(/<a /gm, '<a  target="_blank" ');
 				content += '<br /><a href="https://en.wiktionary.org/wiki/' + title + '#' + lang + '" target="_blank">See in Wiktionary</a>';
-				document.getElementById('title').innerHTML = pr + ': ' + title;
+				document.getElementById('title').innerHTML = 'Pronunciation: ' + title;
 				document.getElementById('text').innerHTML = content;
 			}
 		}
-		catch (err) {
-			if (err == 'miss') {
-				if (sectry) {
-					document.getElementById('title').innerHTML = pr + ': ' + selection;
+		catch(err) {
+			if(err == 'miss') {
+				if(sectry) {
+					sectry = false;
+					document.getElementById('title').innerHTML = 'Pronunciation: ' + selection;
 					document.getElementById('text').innerHTML = 'Wiktionary does not have a pronunciation for "<b>' + selection + '</b>" in <b>' + lang + '</b><br /><br /><a href="https://en.wiktionary.org/wiki/' + selection + '" target="_blank">Search in Wiktionary</a>';
 				}
 				else {
 					sectry = true;
 					title = title.toLowerCase();
-					xhrsend ();
+					xhrsend();
 				}	
 			}
-			else if (this.readyState == 4) {
-				if (this.status != 200) {
+			else if(this.readyState == 4) {
+				if(this.status != 200) {
 					document.getElementById('title').innerHTML = 'Oups';
 					document.getElementById('text').innerHTML = '<br />Error while connecting to Wiktionnary.<br />Status code: ' + String(this.status);
 				}
@@ -74,38 +77,48 @@ var xhttp = new XMLHttpRequest();
 };
 
 //Adding a handler when a message is recieved from content scripts
-chrome.extension.onMessage.addListener(function (message, sender) {
-	if (message.data) {
+chrome.extension.onMessage.addListener(function(message, sender) {
+	if(message.data) {
 		selection = message.data;
 		title = selection;
 		document.getElementById('input').value = selection;
-		xhrsend ();
+		xhrsend();
 	}
 });
 
-function submit () {
+function submit() {
 	selection = document.getElementById('input').value;
 	title = selection;
-	xhrsend ();
+	xhrsend();
 }
 
 document.getElementById("submit").onclick = submit;
 
 document.getElementById("input").addEventListener("keyup", function(event) {
-	if (event.keyCode === 13)
+	if(event.keyCode === 13)
 		document.getElementById("submit").click();
 });
 
-function xhrsend () {
+document.getElementById("language").onchange = function() {
+	lang = document.getElementById("language").value;
+	submit();
+};
+
+document.getElementById("options").onclick = function() {
+	chrome.runtime.openOptionsPage();
+	self.close();
+};
+
+function xhrsend() {
 	try {
-		if (title) {
+		if(title) {
 			document.getElementById('text').innerHTML = '<img width="128" alt="Loading" src="images/loading.gif">'
 			url = 'https://en.wiktionary.org/w/api.php?action=parse&prop=text&format=json&page=' + encodeURI(title.trim());
 			xhttp.open('GET', url, true);
 			xhttp.send();
 		}
 	}
-	catch (err) {
+	catch(err) {
 			document.getElementById('title').innerHTML = 'Oupsie';
 			document.getElementById('text').innerHTML = '<br />Unkown error :<br />' + err;
 	}
@@ -119,14 +132,14 @@ window.addEventListener('click',function(e){
 })
 
 // Send selection when popup is loaded
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
 	chrome.tabs.query({
 		"active": true,
 		"currentWindow": true,
 		"status": "complete",
 		"windowType": "normal"
-	}, function (tabs) {
-		for (tab in tabs) {
+	}, function(tabs) {
+		for(tab in tabs) {
 			//Send Message to the tab
 			chrome.tabs.sendMessage(tabs[tab].id, {
 				method: "getSelection"
